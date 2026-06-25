@@ -1,5 +1,9 @@
 # arbres_quebec
 
+## Objectif
+
+Ce dépôt fait partie d'une série visant à proposer des versions québécoises de jeux de données populaires en science des données. L'objectif est de fournir des alternatives pédagogiques locales, reproductibles et documentées, construites à partir de données réelles du Québec plutôt que de jeux classiques très utilisés comme `iris`.
+
 Pipeline reproductible pour construire un jeu de données pédagogique québécois d'arbres à partir des inventaires écoforestiers ouverts du ministère des Ressources naturelles et des Forêts (MRNF).
 
 ## Décision scientifique
