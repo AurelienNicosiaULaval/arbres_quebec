@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+title: "arbres_quebec: pipeline pédagogique reproductible pour les inventaires forestiers québécois"
+message: "Veuillez citer ce dépôt ainsi que chacune des sources de données indiquées dans le manifeste."
+type: software
+version: 0.1.0
+date-released: 2026-06-25
+license: MIT
+authors:
+  - family-names: "Nicosia"
+    given-names: "Aurelien"
+keywords:
+  - Québec
+  - inventaire forestier
+  - données pédagogiques
+  - reproductibilité
+  - dendrométrie

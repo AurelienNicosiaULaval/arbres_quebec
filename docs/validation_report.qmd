@@ -1,0 +1,404 @@
+---
+title: "Rapport de validation — arbres_quebec"
+subtitle: "Traçabilité, qualité et comparaison des versions complète et pédagogique"
+date: today
+lang: fr
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+execute:
+  echo: true
+  warning: false
+  message: false
+params:
+  full_path: "data_clean/arbres_quebec.csv"
+  small_path: "data_clean/arbres_quebec_small.csv"
+  exclusion_path: "data_clean/exclusion_log.csv"
+  sampling_manifest_path: "data_clean/small_sampling_manifest.csv"
+  dictionary_path: "data_clean/data_dictionary.csv"
+---
+
+```{r}
+#| label: setup
+required <- c("dplyr", "ggplot2", "knitr", "readr", "scales", "stringr", "tibble", "tidyr")
+missing_packages <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing_packages) > 0) {
+  stop("Paquets manquants : ", paste(missing_packages, collapse = ", "))
+}
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(scales)
+library(stringr)
+library(tibble)
+library(tidyr)
+
+paths <- unlist(params)
+missing_files <- paths[!file.exists(paths)]
+if (length(missing_files) > 0) {
+  stop(
+    "Fichiers requis absents : ", paste(missing_files, collapse = ", "),
+    ". Exécuter d'abord scripts/02_clean_botanical_data.R."
+  )
+}
+
+full <- read_csv(params$full_path, show_col_types = FALSE)
+small <- read_csv(params$small_path, show_col_types = FALSE)
+exclusions <- read_csv(params$exclusion_path, show_col_types = FALSE)
+sampling_manifest <- read_csv(params$sampling_manifest_path, show_col_types = FALSE)
+dictionary <- read_csv(params$dictionary_path, show_col_types = FALSE)
+```
+
+# Résumé exécutif
+
+```{r}
+#| label: executive-summary
+summary_table <- tibble(
+  indicateur = c(
+    "Observations — version complète",
+    "Placettes — version complète",
+    "Espèces/codes — version complète",
+    "Observations — version pédagogique",
+    "Placettes — version pédagogique",
+    "Espèces — version pédagogique",
+    "Lignes avec au moins un drapeau de qualité",
+    "Hauteurs observées — version complète",
+    "Hauteurs estimées utilisées — version complète"
+  ),
+  valeur = c(
+    nrow(full),
+    n_distinct(full$plot_id, na.rm = TRUE),
+    n_distinct(full$species_code, na.rm = TRUE),
+    nrow(small),
+    n_distinct(small$plot_id, na.rm = TRUE),
+    n_distinct(small$species_code, na.rm = TRUE),
+    sum(!is.na(full$data_quality_flag)),
+    sum(!is.na(full$height_observed_m)),
+    sum(full$height_source == "estimated", na.rm = TRUE)
+  )
+)
+knitr::kable(summary_table, format.args = list(big.mark = " "))
+```
+
+# Intégrité des clés et de la provenance
+
+```{r}
+#| label: key-checks
+key_checks <- tibble(
+  controle = c(
+    "record_id manquant",
+    "record_id dupliqué",
+    "plot_id manquant",
+    "source_file_sha256 manquant",
+    "measurement_date manquante",
+    "species_code manquant"
+  ),
+  n = c(
+    sum(is.na(full$record_id) | full$record_id == ""),
+    sum(duplicated(full$record_id)),
+    sum(is.na(full$plot_id) | full$plot_id == ""),
+    sum(is.na(full$source_file_sha256) | full$source_file_sha256 == ""),
+    sum(is.na(full$measurement_date)),
+    sum(is.na(full$species_code) | full$species_code == "")
+  ),
+  severite = c("bloquant", "bloquant", "bloquant", "bloquant", "à examiner", "à examiner")
+)
+knitr::kable(key_checks)
+```
+
+Les clés dupliquées ne doivent pas être corrigées arbitrairement. Il faut revenir aux tables sources et aux clés propres à l'inventaire (`ID_ARBRE`, `ID_ARB_MES`, `ID_PE_MES`).
+
+# Nombre d'observations par espèce
+
+```{r}
+#| label: species-counts
+species_counts <- full |>
+  count(species_code, species_fr, species_latin, sort = TRUE, name = "n") |>
+  mutate(proportion = n / sum(n))
+
+knitr::kable(head(species_counts, 30), digits = 4)
+```
+
+```{r}
+#| label: species-count-plot
+#| fig-height: 7
+species_counts |>
+  slice_head(n = 20) |>
+  mutate(label = coalesce(species_fr, species_code),
+         label = reorder(label, n)) |>
+  ggplot(aes(x = n, y = label)) +
+  geom_col() +
+  scale_x_continuous(labels = label_number(big.mark = " ")) +
+  labs(x = "Nombre d'observations", y = NULL,
+       title = "Vingt espèces/codes les plus fréquents")
+```
+
+# Distribution des diamètres
+
+```{r}
+#| label: diameter-summary
+full |>
+  summarise(
+    n_non_manquant = sum(!is.na(diameter_cm)),
+    n_manquant = sum(is.na(diameter_cm)),
+    minimum = min(diameter_cm, na.rm = TRUE),
+    q1 = quantile(diameter_cm, 0.25, na.rm = TRUE),
+    mediane = median(diameter_cm, na.rm = TRUE),
+    moyenne = mean(diameter_cm, na.rm = TRUE),
+    q3 = quantile(diameter_cm, 0.75, na.rm = TRUE),
+    maximum = max(diameter_cm, na.rm = TRUE)
+  ) |>
+  knitr::kable(digits = 2)
+```
+
+```{r}
+#| label: diameter-distribution
+#| fig-height: 5
+full |>
+  filter(!is.na(diameter_cm), diameter_cm > 0) |>
+  ggplot(aes(diameter_cm)) +
+  geom_histogram(bins = 60) +
+  labs(x = "DHP (cm)", y = "Effectif", title = "Distribution du diamètre")
+```
+
+# Distribution des hauteurs
+
+```{r}
+#| label: height-source-summary
+full |>
+  count(height_source, name = "n") |>
+  mutate(proportion = n / sum(n)) |>
+  knitr::kable(digits = 4)
+```
+
+```{r}
+#| label: observed-height-distribution
+#| fig-height: 5
+full |>
+  filter(!is.na(height_observed_m), height_observed_m > 0) |>
+  ggplot(aes(height_observed_m)) +
+  geom_histogram(bins = 60) +
+  labs(x = "Hauteur observée (m)", y = "Effectif",
+       title = "Distribution des hauteurs observées")
+```
+
+```{r}
+#| label: height-comparison
+#| fig-height: 5
+full |>
+  filter(height_source %in% c("observed", "estimated"), !is.na(height_m)) |>
+  ggplot(aes(height_m)) +
+  geom_density() +
+  facet_wrap(~ height_source, scales = "free_y") +
+  labs(x = "Hauteur (m)", y = "Densité",
+       title = "Hauteurs observées et estimées — ne pas les confondre")
+```
+
+# Valeurs manquantes
+
+```{r}
+#| label: missingness
+missingness <- full |>
+  summarise(across(everything(), ~ sum(is.na(.x)))) |>
+  pivot_longer(everything(), names_to = "variable", values_to = "n_missing") |>
+  mutate(
+    proportion_missing = n_missing / nrow(full),
+    variable = reorder(variable, proportion_missing)
+  ) |>
+  arrange(desc(proportion_missing))
+
+knitr::kable(head(missingness, 40), digits = 4)
+```
+
+```{r}
+#| label: missingness-plot
+#| fig-height: 9
+missingness |>
+  filter(n_missing > 0) |>
+  ggplot(aes(proportion_missing, variable)) +
+  geom_col() +
+  scale_x_continuous(labels = percent) +
+  labs(x = "Proportion manquante", y = NULL,
+       title = "Valeurs manquantes par variable")
+```
+
+# Valeurs impossibles ou suspectes
+
+```{r}
+#| label: quality-flags
+flags <- full |>
+  filter(!is.na(data_quality_flag)) |>
+  separate_rows(data_quality_flag, sep = ";") |>
+  count(data_quality_flag, sort = TRUE, name = "n") |>
+  mutate(proportion_full = n / nrow(full))
+
+knitr::kable(flags, digits = 4)
+```
+
+```{r}
+#| label: explicit-screening
+screening <- tibble(
+  regle = c(
+    "diameter_cm <= 0",
+    "diameter_cm > 300",
+    "height_observed_m <= 0",
+    "height_observed_m > 70",
+    "age_years < 0",
+    "age_years > 500",
+    "latitude hors [-90, 90]",
+    "longitude hors [-180, 180]"
+  ),
+  n = c(
+    sum(full$diameter_cm <= 0, na.rm = TRUE),
+    sum(full$diameter_cm > 300, na.rm = TRUE),
+    sum(full$height_observed_m <= 0, na.rm = TRUE),
+    sum(full$height_observed_m > 70, na.rm = TRUE),
+    sum(full$age_years < 0, na.rm = TRUE),
+    sum(full$age_years > 500, na.rm = TRUE),
+    sum(!is.na(full$latitude) & (full$latitude < -90 | full$latitude > 90)),
+    sum(!is.na(full$longitude) & (full$longitude < -180 | full$longitude > 180))
+  ),
+  action = "signaler; ne pas supprimer automatiquement"
+)
+knitr::kable(screening)
+```
+
+Les seuils de 300 cm, 70 m et 500 ans sont des seuils de dépistage prudents du pipeline, non des maxima biologiques officiels. Toute exclusion doit s'appuyer sur la norme, le contexte et l'observation source.
+
+# Équilibre de la version pédagogique
+
+```{r}
+#| label: small-balance
+small_balance <- small |>
+  count(species_code, species, name = "n") |>
+  mutate(proportion = n / sum(n))
+knitr::kable(small_balance, digits = 4)
+```
+
+```{r}
+#| label: sampling-manifest
+knitr::kable(sampling_manifest)
+```
+
+```{r}
+#| label: small-diameter-height
+#| fig-height: 6
+small |>
+  ggplot(aes(diameter_cm, height_m, shape = species)) +
+  geom_point(alpha = 0.7) +
+  labs(x = "DHP (cm)", y = "Hauteur observée (m)",
+       title = "Version pédagogique : diamètre et hauteur par espèce")
+```
+
+# Comparaison entre version complète et version réduite
+
+```{r}
+#| label: full-vs-small-summary
+comparison <- bind_rows(
+  full |>
+    transmute(version = "complète", plot_id = as.character(plot_id), species_code, diameter_cm,
+              height_m = height_observed_m, age_years),
+  small |>
+    transmute(version = "pédagogique", plot_id = as.character(plot_id), species_code, diameter_cm,
+              height_m, age_years)
+) |>
+  group_by(version) |>
+  summarise(
+    n = n(),
+    species = n_distinct(species_code),
+    plots = n_distinct(plot_id, na.rm = TRUE),
+    diameter_mean = mean(diameter_cm, na.rm = TRUE),
+    diameter_median = median(diameter_cm, na.rm = TRUE),
+    height_mean = mean(height_m, na.rm = TRUE),
+    height_median = median(height_m, na.rm = TRUE),
+    age_missing = mean(is.na(age_years)),
+    .groups = "drop"
+  )
+knitr::kable(comparison, digits = 3)
+```
+
+```{r}
+#| label: full-vs-small-ecdf
+#| fig-height: 5
+bind_rows(
+  full |> transmute(version = "complète", diameter_cm),
+  small |> transmute(version = "pédagogique", diameter_cm)
+) |>
+  filter(!is.na(diameter_cm)) |>
+  ggplot(aes(diameter_cm, linetype = version)) +
+  stat_ecdf() +
+  labs(x = "DHP (cm)", y = "Fonction de répartition empirique",
+       title = "Sélection induite par la version pédagogique")
+```
+
+# Exclusions et justification
+
+```{r}
+#| label: exclusion-summary
+exclusion_summary <- exclusions |>
+  separate_rows(exclusion_reason, sep = ";") |>
+  count(stage, exclusion_reason, sort = TRUE, name = "n")
+knitr::kable(exclusion_summary)
+```
+
+```{r}
+#| label: exclusion-by-species
+exclusions |>
+  count(stage, species_code, sort = TRUE, name = "n") |>
+  group_by(stage) |>
+  slice_head(n = 20) |>
+  ungroup() |>
+  knitr::kable()
+```
+
+# Contrôles pédagogiques essentiels
+
+```{r}
+#| label: pedagogical-checks
+pedagogical_checks <- tibble(
+  controle = c(
+    "3 à 5 espèces",
+    "Effectifs égaux entre espèces",
+    "DHP entièrement observé",
+    "Hauteur entièrement observée",
+    "Une ligne maximum par espèce et placette",
+    "Présence de plot_id pour validation groupée",
+    "Taxonomie revue pour toutes les classes"
+  ),
+  reussi = c(
+    between(n_distinct(small$species_code), 3L, 5L),
+    n_distinct((small |> count(species_code))$n) == 1L,
+    all(!is.na(small$diameter_cm) & small$diameter_cm > 0),
+    all(!is.na(small$height_m) & small$height_m > 0),
+    !anyDuplicated(small |> select(species_code, plot_id)),
+    "plot_id" %in% names(small) && all(!is.na(small$plot_id)),
+    !any(sampling_manifest$selection_requires_taxonomic_review)
+  )
+)
+knitr::kable(pedagogical_checks)
+```
+
+# Dictionnaire et reproductibilité
+
+```{r}
+#| label: dictionary-check
+missing_dictionary_entries <- setdiff(names(full), dictionary$variable)
+extra_dictionary_entries <- setdiff(dictionary$variable, c(names(full), names(small)))
+
+tibble(
+  controle = c("Variables complètes sans dictionnaire", "Entrées non présentes dans les fichiers courants"),
+  resultat = c(
+    if (length(missing_dictionary_entries) == 0) "aucune" else paste(missing_dictionary_entries, collapse = ", "),
+    if (length(extra_dictionary_entries) == 0) "aucune" else paste(extra_dictionary_entries, collapse = ", ")
+  )
+) |>
+  knitr::kable()
+```
+
+```{r}
+#| label: session-info
+sessionInfo()
+```
