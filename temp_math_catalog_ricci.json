@@ -1,0 +1,102 @@
+[
+  {
+    "num": 22,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Flot de Ricci",
+    "title": "An Introduction to Ricci Flow - Introduction et sommaire",
+    "author": "Alix Deruelle",
+    "path": "05 - Geometrie et topologie/Geometrie differentielle et flot de Ricci/Flot de Ricci - Alix Deruelle/00 - Introduction et sommaire.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/media/filer_public/b2/5b/b25baf69-c8f3-4fd2-a13e-6654bb001d2c/contents-intro-rf-2022-2023.pdf"
+  },
+  {
+    "num": 23,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Flot de Ricci",
+    "title": "An Introduction to Ricci Flow - Chapter 1",
+    "author": "Alix Deruelle",
+    "path": "05 - Geometrie et topologie/Geometrie differentielle et flot de Ricci/Flot de Ricci - Alix Deruelle/01 - Basics of the Ricci flow equation.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/media/filer_public/73/bf/73bf15c0-1014-4e90-9f68-6a1e14b2ac05/chapitre-1-intro-rf-2022-2023.pdf"
+  },
+  {
+    "num": 24,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Flot de Ricci",
+    "title": "An Introduction to Ricci Flow - Chapter 2",
+    "author": "Alix Deruelle",
+    "path": "05 - Geometrie et topologie/Geometrie differentielle et flot de Ricci/Flot de Ricci - Alix Deruelle/02 - Solitons and special solutions.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/media/filer_public/68/67/6867b8b3-23c3-46a9-873f-0b858b445dfa/chapitre-2-intro-rf-2023-2024.pdf"
+  },
+  {
+    "num": 25,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Flot de Ricci",
+    "title": "An Introduction to Ricci Flow - Chapter 3",
+    "author": "Alix Deruelle",
+    "path": "05 - Geometrie et topologie/Geometrie differentielle et flot de Ricci/Flot de Ricci - Alix Deruelle/03 - Covariant derivatives estimates.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/media/filer_public/c5/a9/c5a9b702-bd50-4935-8c0b-6abd63e77a67/chapitre-3-intro-rf-2023-2024.pdf"
+  },
+  {
+    "num": 26,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Flot de Ricci",
+    "title": "An Introduction to Ricci Flow - Chapter 4",
+    "author": "Alix Deruelle",
+    "path": "05 - Geometrie et topologie/Geometrie differentielle et flot de Ricci/Flot de Ricci - Alix Deruelle/04 - Preservation of curvature conditions.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/media/filer_public/4f/49/4f490e1f-ec83-4c11-91d3-683419190880/chapitre-4-intro-rf-2023-2024.pdf"
+  },
+  {
+    "num": 27,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Flot de Ricci",
+    "title": "An Introduction to Ricci Flow - Chapter 5",
+    "author": "Alix Deruelle",
+    "path": "05 - Geometrie et topologie/Geometrie differentielle et flot de Ricci/Flot de Ricci - Alix Deruelle/05 - Uniformization of surfaces of high genus.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/media/filer_public/0a/26/0a26dcde-cca9-4366-8612-ab8158abe391/chapitre-5-intro-rf-2023-2024.pdf"
+  },
+  {
+    "num": 28,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Flot de Ricci",
+    "title": "An Introduction to Ricci Flow - Chapter 6",
+    "author": "Alix Deruelle",
+    "path": "05 - Geometrie et topologie/Geometrie differentielle et flot de Ricci/Flot de Ricci - Alix Deruelle/06 - Uniformization of surfaces of genus zero.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/media/filer_public/58/d3/58d3825c-fed3-4596-8dcd-139aab39bd34/chapitre-6-intro-rf-2023-2024.pdf"
+  },
+  {
+    "num": 29,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Flot de Ricci",
+    "title": "An Introduction to Ricci Flow - Chapter 7",
+    "author": "Alix Deruelle",
+    "path": "05 - Geometrie et topologie/Geometrie differentielle et flot de Ricci/Flot de Ricci - Alix Deruelle/07 - Perelman's entropy.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/media/filer_public/18/ee/18eef4fc-f458-4c2f-a49f-073c5014e396/chapitre-7-intro-rf-2023-2024.pdf"
+  },
+  {
+    "num": 30,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Flot de Ricci",
+    "title": "An Introduction to Ricci Flow - Chapter 8",
+    "author": "Alix Deruelle",
+    "path": "05 - Geometrie et topologie/Geometrie differentielle et flot de Ricci/Flot de Ricci - Alix Deruelle/08 - Existence uniqueness and convergence.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/media/filer_public/51/55/5155fb06-e211-46b6-a7ab-ac286cf7951e/chapitre-8-intro-rf-2023-2024.pdf"
+  },
+  {
+    "num": 31,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Flot de Ricci",
+    "title": "An Introduction to Ricci Flow - Appendix",
+    "author": "Alix Deruelle",
+    "path": "05 - Geometrie et topologie/Geometrie differentielle et flot de Ricci/Flot de Ricci - Alix Deruelle/09 - Appendix.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/media/filer_public/4e/56/4e56a5d9-1c96-43df-b876-7d3f2cd8b171/appendice-intro-rf-2023-2024.pdf"
+  }
+]
