@@ -1,0 +1,42 @@
+name: Récupération ciblée des cinq PDF finaux
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Installer pypdf
+        run: python -m pip install --upgrade pypdf
+      - name: Récupérer les instantanés ciblés
+        run: |
+          set +e
+          python temp_wayback_alt_recovery.py > run_wayback_alt.log 2>&1
+          status=$?
+          cat run_wayback_alt.log
+          exit $status
+      - name: Créer l'archive
+        if: always()
+        run: |
+          python - <<'PY'
+          import shutil
+          shutil.make_archive("notes-master-math-france-wayback-alt", "zip", "notes_master_math_france_wayback_alt")
+          PY
+      - name: Publier l'archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notes-master-math-france-wayback-alt
+          path: |
+            notes-master-math-france-wayback-alt.zip
+            notes_master_math_france_wayback_alt/manifest.csv
+            notes_master_math_france_wayback_alt/manifest.json
+            run_wayback_alt.log
+          if-no-files-found: error
+          retention-days: 3
