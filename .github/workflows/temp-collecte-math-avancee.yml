@@ -1,0 +1,38 @@
+name: Collecte temporaire de notes de mathématiques avancées
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Installer les dépendances
+        run: python -m pip install --upgrade requests pypdf
+      - name: Télécharger et valider les PDF
+        run: python temp_download_math_avancee.py | tee run_math_avancee.log
+      - name: Créer l'archive
+        if: always()
+        run: |
+          python - <<'PY'
+          import shutil
+          shutil.make_archive("notes-math-avancees-france", "zip", "notes_math_avancees_france")
+          PY
+      - name: Publier l'archive et les manifestes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notes-math-avancees-france
+          path: |
+            notes-math-avancees-france.zip
+            notes_math_avancees_france/manifest.csv
+            notes_math_avancees_france/manifest.json
+            notes_math_avancees_france/SUMMARY.json
+            run_math_avancee.log
+          if-no-files-found: error
+          retention-days: 3
