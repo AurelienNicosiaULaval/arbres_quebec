@@ -1,0 +1,132 @@
+[
+  {
+    "num": 32,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Probabilités numériques",
+    "title": "Probabilités numériques - polycopié",
+    "author": "Gilles Pagès et Vincent Lemaire",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/01 - Probabilites numeriques - Pages et Lemaire.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/proba_num_poly.pdf"
+  },
+  {
+    "num": 33,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Contrôle stochastique",
+    "title": "Convexité, optimisation et contrôle stochastique - polycopié complet",
+    "author": "Idris Kharroubi",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/02 - Convexite optimisation et controle stochastique - Kharroubi.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/controle_sto_poly.pdf"
+  },
+  {
+    "num": 34,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Processus de diffusion",
+    "title": "Introduction aux processus de diffusion - polycopié",
+    "author": "Lorenzo Zambotti",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/03 - Introduction aux processus de diffusion - Zambotti.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/processus_diffusion_poly.pdf"
+  },
+  {
+    "num": 35,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Modèles de sauts",
+    "title": "Modèles de sauts - polycopié",
+    "author": "Thomas Duquesne",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/04 - Modeles de sauts - Duquesne.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/modeles_sauts_poly.pdf"
+  },
+  {
+    "num": 36,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Modèles de taux",
+    "title": "Modèles de taux - polycopié",
+    "author": "Nicole El Karoui",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/05 - Modeles de taux - Nicole El Karoui.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/modeles_taux_poly_Nicole_El_Karoui.pdf"
+  },
+  {
+    "num": 37,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Produits dérivés",
+    "title": "Modélisation GBM et portefeuille autofinancé",
+    "author": "Emmanuel Gobet",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/06 - Gobet - GBM et portefeuille autofinance.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/W1-Notes-ModelisationGBM-PortefeuilleAutofi-2021-22.pdf"
+  },
+  {
+    "num": 38,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Produits dérivés",
+    "title": "Modèle de Black-Scholes",
+    "author": "Emmanuel Gobet",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/07 - Gobet - Modele de Black-Scholes.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/W2_Notes_BlackScholes_2021-22.pdf"
+  },
+  {
+    "num": 39,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Produits dérivés",
+    "title": "Alternative Modelling",
+    "author": "Emmanuel Gobet",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/08 - Gobet - Alternative Modelling.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/W3_Notes_AlternativeModelling_2021-22.pdf"
+  },
+  {
+    "num": 40,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Produits dérivés",
+    "title": "Notes de modélisation stochastique - semaine 4",
+    "author": "Emmanuel Gobet",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/09 - Gobet - Modelisation stochastique semaine 4.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/W4-Notes.pdf"
+  },
+  {
+    "num": 41,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Produits dérivés",
+    "title": "Modélisation et pricing linéaire et non linéaire",
+    "author": "Emmanuel Gobet",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/10 - Gobet - Pricing lineaire et non lineaire.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/W5_Notes_ModelisationPricingLineaireNonlineaire_2021-22.pdf"
+  },
+  {
+    "num": 42,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Modèles de taux",
+    "title": "Modèles de taux - cours 1",
+    "author": "Caroline Hillairet",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/11 - Hillairet - Modeles de taux cours 1.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/modeles_taux_cours1_hillairet.pdf"
+  },
+  {
+    "num": 43,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Modèles de taux",
+    "title": "Modèles de taux - cours 2",
+    "author": "Caroline Hillairet",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/12 - Hillairet - Modeles de taux cours 2.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/modeles_taux_cours2_hillairet.pdf"
+  },
+  {
+    "num": 44,
+    "institution": "Master El Karoui",
+    "level": "M2",
+    "domain": "Modèles de taux",
+    "title": "Modèles de taux - cours 3",
+    "author": "Caroline Hillairet",
+    "path": "01 - Proba-stat/01.8 Master El Karoui - Probabilites et finance/13 - Hillairet - Modeles de taux cours 3.pdf",
+    "url": "https://github.com/theojalabert/jalabonsamaritain-data/releases/download/data_ek/modeles_taux_cours3_hillairet.pdf"
+  }
+]
