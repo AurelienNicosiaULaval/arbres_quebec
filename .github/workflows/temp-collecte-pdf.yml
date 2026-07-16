@@ -1,0 +1,42 @@
+name: Collecte temporaire des notes de master PDF
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Installer les dépendances
+        run: python -m pip install --upgrade requests pypdf warcio
+      - name: Récupérer en parallèle les PDF manquants
+        run: |
+          set +e
+          python temp_download_missing_commoncrawl_fast.py > run_commoncrawl_fast.log 2>&1
+          status=$?
+          cat run_commoncrawl_fast.log
+          exit $status
+      - name: Créer l'archive
+        if: always()
+        run: |
+          python - <<'PY'
+          import shutil
+          shutil.make_archive("notes-master-math-france-commoncrawl-fast","zip","notes_master_math_france_missing_cc_fast")
+          PY
+      - name: Publier l'archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notes-master-math-france-commoncrawl-fast
+          path: |
+            notes-master-math-france-commoncrawl-fast.zip
+            notes_master_math_france_missing_cc_fast/manifest.csv
+            notes_master_math_france_missing_cc_fast/manifest.json
+            run_commoncrawl_fast.log
+          if-no-files-found: error
+          retention-days: 3
