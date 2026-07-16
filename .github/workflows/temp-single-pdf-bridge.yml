@@ -1,0 +1,21 @@
+name: Pont temporaire vers Drive, PDF unique
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Télécharger un petit PDF officiel
+        run: |
+          mkdir -p out
+          curl -L --fail --retry 3 -o "out/Ricci-Flow-Appendix-Alix-Deruelle.pdf" "https://www.imo.universite-paris-saclay.fr/media/filer_public/4e/56/4e56a5d9-1c96-43df-b876-7d3f2cd8b171/appendice-intro-rf-2023-2024.pdf"
+          test "$(head -c 5 out/Ricci-Flow-Appendix-Alix-Deruelle.pdf)" = "%PDF-"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ricci-flow-appendix-pdf
+          path: out/Ricci-Flow-Appendix-Alix-Deruelle.pdf
+          compression-level: 0
+          retention-days: 1
