@@ -1,0 +1,102 @@
+[
+  {
+    "num": 12,
+    "institution": "École polytechnique / Paris-Saclay",
+    "level": "M1/M2",
+    "domain": "Topologie différentielle",
+    "title": "Topologie différentielle, MAT553",
+    "author": "Patrick Massot",
+    "path": "05 - Geometrie et topologie/Geometrie differentielle et flot de Ricci/Polytechnique MAT553 - Topologie differentielle - Patrick Massot.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/~patrick.massot/enseignement/mat553/poly.pdf"
+  },
+  {
+    "num": 13,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Apprentissage statistique",
+    "title": "Fondamentaux de l'apprentissage statistique",
+    "author": "Sylvain Arlot",
+    "path": "01 - Proba-stat/01.6 Apprentissage statistique et donnees/Arlot - Fondamentaux de l'apprentissage statistique 2025-2026.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/~sylvain.arlot/enseign/2025-26_M2/1-fondamentaux.pdf"
+  },
+  {
+    "num": 14,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Validation croisée",
+    "title": "Validation croisée",
+    "author": "Sylvain Arlot",
+    "path": "01 - Proba-stat/01.6 Apprentissage statistique et donnees/Arlot - Validation croisee 2025-2026.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/~sylvain.arlot/enseign/2025-26_M2/2-validation_croisee.pdf"
+  },
+  {
+    "num": 15,
+    "institution": "Université Paris-Saclay",
+    "level": "M2",
+    "domain": "Rééchantillonnage",
+    "title": "Rééchantillonnage",
+    "author": "Sylvain Arlot",
+    "path": "01 - Proba-stat/01.6 Apprentissage statistique et donnees/Arlot - Reechantillonnage 2025-2026.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/~sylvain.arlot/enseign/2025-26_M2/3-reechantillonnage.pdf"
+  },
+  {
+    "num": 16,
+    "institution": "Université Paris-Saclay",
+    "level": "M1",
+    "domain": "Calcul formel",
+    "title": "Calcul formel",
+    "author": "Stéphane Fischler",
+    "path": "04 - Algebre, nombres et Lie/Arithmetique et calcul formel/Paris-Saclay - Calcul formel - Stephane Fischler 2024-2025.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/~fischler/ens/MAO/poly2024-2025.pdf"
+  },
+  {
+    "num": 17,
+    "institution": "Université Paris-Saclay",
+    "level": "M1",
+    "domain": "Arithmétique",
+    "title": "Arithmétique",
+    "author": "Étienne Fouvry et Frédéric Bourgeois",
+    "path": "04 - Algebre, nombres et Lie/Arithmetique et calcul formel/Paris-Saclay - Arithmetique M1 - Fouvry et Bourgeois.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/~frederic.bourgeois/arithmetique/poly.pdf"
+  },
+  {
+    "num": 18,
+    "institution": "UPMC Paris 6 / Paris-Saclay",
+    "level": "M1",
+    "domain": "Analyse fonctionnelle et calcul des variations",
+    "title": "Analyse fonctionnelle approfondie et calcul des variations",
+    "author": "Jean-François Babadjian",
+    "path": "02 - Analyse, optimisation et outils/Calcul des variations et analyse fonctionnelle/Babadjian - Analyse fonctionnelle approfondie et calcul des variations.pdf",
+    "url": "https://www.imo.universite-paris-saclay.fr/~jean-francois.babadjian/files/4M025bis/Poly-4M025-2017.pdf"
+  },
+  {
+    "num": 19,
+    "institution": "École polytechnique / CMAP",
+    "level": "M1/M2",
+    "domain": "Optimisation et contrôle",
+    "title": "Optimisation et contrôle",
+    "author": "Grégoire Allaire et Alexandre Ern",
+    "path": "02 - Analyse, optimisation et outils/Optimisation et controle/Polytechnique - Optimisation et controle - Allaire et Ern 2026.pdf",
+    "url": "https://www.cmap.polytechnique.fr/~allaire/map435/poly435.pdf"
+  },
+  {
+    "num": 20,
+    "institution": "École polytechnique / CMAP",
+    "level": "Cycle ingénieur avancé",
+    "domain": "Analyse numérique et optimisation",
+    "title": "Analyse numérique et optimisation",
+    "author": "Grégoire Allaire",
+    "path": "03 - EDP et calcul scientifique/Analyse numerique et elements finis/Polytechnique MAP431 - Analyse numerique et optimisation - Gregoire Allaire.pdf",
+    "url": "https://www.cmap.polytechnique.fr/~allaire/map431/livre-web.pdf"
+  },
+  {
+    "num": 21,
+    "institution": "École polytechnique / CMAP",
+    "level": "M2/Doctorat",
+    "domain": "Contrôle ergodique et algèbre tropicale",
+    "title": "Weak KAM Theory and Tropical Methods in Ergodic Control",
+    "author": "Stéphane Gaubert",
+    "path": "02 - Analyse, optimisation et outils/Optimisation et controle/Polytechnique - Weak KAM and Tropical Methods - Stephane Gaubert.pdf",
+    "url": "https://www.cmap.polytechnique.fr/~gaubert/WEAKKAM/SlidesWeakKamBordeaux2011.pdf"
+  }
+]
