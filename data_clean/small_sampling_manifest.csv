@@ -1,0 +1,5 @@
+species_code,species_fr,species_latin,taxonomy_match_status,taxonomy_match_method,eligible_plot_count,selected_n,selection_rank,sampling_seed,selection_requires_taxonomic_review
+SAB,Sapin baumier,Abies balsamea,reviewed,exact_vernacular_vascan,23382,50,1,20260625,FALSE
+EPN,Épinette noire,Picea mariana,reviewed,exact_vernacular_vascan,13290,50,2,20260625,FALSE
+BOP,Bouleau à papier (blanc),Betula papyrifera,reviewed,exact_vernacular_vascan,10096,50,3,20260625,FALSE
+ERR,Érable rouge,Acer rubrum,reviewed,exact_vernacular_vascan,7057,50,4,20260625,FALSE

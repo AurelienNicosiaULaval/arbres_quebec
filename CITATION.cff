@@ -1,16 +1,23 @@
 cff-version: 1.2.0
-title: "arbres_quebec: pipeline pédagogique reproductible pour les inventaires forestiers québécois"
-message: "Veuillez citer ce dépôt ainsi que chacune des sources de données indiquées dans le manifeste."
-type: software
-version: 0.1.0
-date-released: 2026-06-25
-license: MIT
+title: "Arbres du Québec : jeu de données pédagogique issu de PET5"
+message: "Citer cette version ainsi que le MRNF et VASCAN, selon DATA_LICENSES.md."
+type: dataset
+version: 1.0.0
+date-released: 2026-09-05
+license: CC-BY-4.0
+repository-code: "https://github.com/AurelienNicosiaULaval/arbres_quebec"
+url: "https://github.com/AurelienNicosiaULaval/arbres_quebec/releases/tag/v1.0.0"
 authors:
   - family-names: "Nicosia"
-    given-names: "Aurelien"
+    given-names: "Aurélien"
+abstract: >-
+  Jeu de données pédagogique de deux cents arbres de quatre espèces du Québec,
+  sélectionnés dans les placettes temporaires du cinquième inventaire
+  écoforestier. Les diamètres et hauteurs observés sont accompagnés de leur
+  provenance, de dictionnaires, de contrôles reproductibles et d'une activité R.
 keywords:
   - Québec
-  - inventaire forestier
-  - données pédagogiques
-  - reproductibilité
-  - dendrométrie
+  - statistique
+  - enseignement
+  - forêt
+  - données ouvertes

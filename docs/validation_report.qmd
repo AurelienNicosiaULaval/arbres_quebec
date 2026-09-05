@@ -1,7 +1,6 @@
 ---
-title: "Rapport de validation — arbres_quebec"
-subtitle: "Traçabilité, qualité et comparaison des versions complète et pédagogique"
-date: today
+title: "Validation du jeu Arbres du Québec"
+subtitle: "Version 1.0.0 du 5 septembre 2026"
 lang: fr
 format:
   html:
@@ -9,396 +8,178 @@ format:
     code-fold: true
     embed-resources: true
 execute:
-  echo: true
   warning: false
   message: false
-params:
-  full_path: "data_clean/arbres_quebec.csv"
-  small_path: "data_clean/arbres_quebec_small.csv"
-  exclusion_path: "data_clean/exclusion_log.csv"
-  sampling_manifest_path: "data_clean/small_sampling_manifest.csv"
-  dictionary_path: "data_clean/data_dictionary.csv"
 ---
 
 ```{r}
 #| label: setup
-required <- c("dplyr", "ggplot2", "knitr", "readr", "scales", "stringr", "tibble", "tidyr")
-missing_packages <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]
-if (length(missing_packages) > 0) {
-  stop("Paquets manquants : ", paste(missing_packages, collapse = ", "))
-}
-
+#| include: false
+library(readr)
 library(dplyr)
 library(ggplot2)
-library(readr)
-library(scales)
-library(stringr)
-library(tibble)
-library(tidyr)
-
-paths <- unlist(params)
-missing_files <- paths[!file.exists(paths)]
-if (length(missing_files) > 0) {
-  stop(
-    "Fichiers requis absents : ", paste(missing_files, collapse = ", "),
-    ". Exécuter d'abord scripts/02_clean_botanical_data.R."
-  )
-}
-
-full <- read_csv(params$full_path, show_col_types = FALSE)
-small <- read_csv(params$small_path, show_col_types = FALSE)
-exclusions <- read_csv(params$exclusion_path, show_col_types = FALSE)
-sampling_manifest <- read_csv(params$sampling_manifest_path, show_col_types = FALSE)
-dictionary <- read_csv(params$dictionary_path, show_col_types = FALSE)
+library(knitr)
+library(jsonlite)
+small <- read_csv("data_clean/arbres_quebec_small.csv", show_col_types = FALSE,
+  col_types = cols(.default = col_guess(), plot_id = col_character(),
+                   record_id = col_character(), tree_id = col_character()))
+checks <- read_csv("validation/release_checks.csv", show_col_types = FALSE)
+audit <- read_json("validation/source_verification.json", simplifyVector = TRUE)
+profile <- read_csv("validation/sample_profile.csv", show_col_types = FALSE)
+full <- read_csv("validation/full_profile.csv", show_col_types = FALSE)
+missingness <- read_csv("validation/small_missingness.csv", show_col_types = FALSE)
+exclusions <- read_csv("validation/exclusion_summary.csv", show_col_types = FALSE)
+review <- read_csv("references/pedagogical_taxonomy_review.csv", show_col_types = FALSE)
+stopifnot(all(checks$passed), audit$all_passed,
+  audit$small_sha256 == digest::digest(file="data_clean/arbres_quebec_small.csv", algo="sha256"))
 ```
 
-# Résumé exécutif
+## Verdict et portée
+
+La version pédagogique comporte `r nrow(small)` arbres de quatre espèces,
+avec 50 observations par espèce. Les diamètres et hauteurs sont observés,
+strictement positifs et contrôlés directement contre le GeoPackage original.
+Les `r nrow(audit$checks)` contrôles de la vérification depuis les sources ont
+réussi. Le script de validation s'arrête si un contrôle échoue.
+
+La livraison est utilisable pour l'exploration et l'enseignement avec les
+restrictions d'échantillonnage ci-dessous. Elle ne constitue pas un nouvel
+inventaire représentatif du Québec ni une validation botanique sur le terrain.
+
+## Portrait du petit jeu
 
 ```{r}
-#| label: executive-summary
-summary_table <- tibble(
-  indicateur = c(
-    "Observations — version complète",
-    "Placettes — version complète",
-    "Espèces/codes — version complète",
-    "Observations — version pédagogique",
-    "Placettes — version pédagogique",
-    "Espèces — version pédagogique",
-    "Lignes avec au moins un drapeau de qualité",
-    "Hauteurs observées — version complète",
-    "Hauteurs estimées utilisées — version complète"
-  ),
-  valeur = c(
-    nrow(full),
-    n_distinct(full$plot_id, na.rm = TRUE),
-    n_distinct(full$species_code, na.rm = TRUE),
-    nrow(small),
-    n_distinct(small$plot_id, na.rm = TRUE),
-    n_distinct(small$species_code, na.rm = TRUE),
-    sum(!is.na(full$data_quality_flag)),
-    sum(!is.na(full$height_observed_m)),
-    sum(full$height_source == "estimated", na.rm = TRUE)
-  )
-)
-knitr::kable(summary_table, format.args = list(big.mark = " "))
+profile |>
+  select(species, n, plots, diameter_mean_cm, height_mean_m, age_missing,
+         survey_year_min, survey_year_max) |>
+  kable(digits = 2, col.names = c("Espèce", "Arbres", "Placettes", "DHP moyen (cm)",
+    "Hauteur moyenne (m)", "Âges manquants", "Première année", "Dernière année"))
 ```
 
-# Intégrité des clés et de la provenance
+Le petit jeu contient `r n_distinct(small$plot_id)` placettes distinctes et
+`r n_distinct(small$ecological_region)` régions écologiques. Les relevés vont de
+`r min(small$survey_year)` à `r max(small$survey_year)`. Les dates sont celles
+publiées par le MRNF, y compris celles antérieures à 2017 si elles figurent
+ainsi dans l'archive. Aucune date n'est remplacée pour la faire correspondre
+à une description générale du programme.
 
 ```{r}
-#| label: key-checks
-key_checks <- tibble(
-  controle = c(
-    "record_id manquant",
-    "record_id dupliqué",
-    "plot_id manquant",
-    "source_file_sha256 manquant",
-    "measurement_date manquante",
-    "species_code manquant"
-  ),
-  n = c(
-    sum(is.na(full$record_id) | full$record_id == ""),
-    sum(duplicated(full$record_id)),
-    sum(is.na(full$plot_id) | full$plot_id == ""),
-    sum(is.na(full$source_file_sha256) | full$source_file_sha256 == ""),
-    sum(is.na(full$measurement_date)),
-    sum(is.na(full$species_code) | full$species_code == "")
-  ),
-  severite = c("bloquant", "bloquant", "bloquant", "bloquant", "à examiner", "à examiner")
-)
-knitr::kable(key_checks)
+#| fig-width: 8
+#| fig-height: 4.8
+#| fig-alt: "Nombre des 200 arbres par année de relevé et par espèce; la sélection n’est pas équilibrée dans le temps."
+ggplot(small, aes(factor(survey_year), fill = species)) +
+  geom_bar() +
+  scale_fill_brewer(palette = "Dark2") +
+  labs(x = "Année du relevé", y = "Nombre d'arbres", fill = "Espèce") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom") +
+  guides(fill = guide_legend(nrow = 2))
 ```
 
-Les clés dupliquées ne doivent pas être corrigées arbitrairement. Il faut revenir aux tables sources et aux clés propres à l'inventaire (`ID_ARBRE`, `ID_ARB_MES`, `ID_PE_MES`).
+## Contrôle indépendant de la provenance
 
-# Nombre d'observations par espèce
+`scripts/04_validate_release.R --from-source` interroge directement les tables
+`DENDRO_ARBRES`, `DENDRO_ARBRES_ETUDES`, `PLACETTE` et `CLASSI_ECO_PE`.
+Il confronte les 200 lignes aux identifiants, essences, diamètres, hauteurs,
+âges, dates et libellés décodés du dictionnaire. Les conversions sont recalculées :
+DHP en millimètres divisé par 10; hauteur en décimètres divisée par 10.
+Les positions manquantes des âges sont comparées aussi.
+
+Le résultat détaillé est conservé dans `validation/source_verification.json`.
+Son empreinte du CSV lie cette vérification à cette version précise des 200
+observations. `data_clean/arbres_quebec_small_provenance.csv` livre les valeurs
+sources nécessaires à l'inspection ligne par ligne.
 
 ```{r}
-#| label: species-counts
-species_counts <- full |>
-  count(species_code, species_fr, species_latin, sort = TRUE, name = "n") |>
-  mutate(proportion = n / sum(n))
-
-knitr::kable(head(species_counts, 30), digits = 4)
+kable(audit$checks, col.names = c("Contrôle", "Réussi", "Détail"))
 ```
+
+## Valeurs manquantes et variables dérivées
 
 ```{r}
-#| label: species-count-plot
-#| fig-height: 7
-species_counts |>
-  slice_head(n = 20) |>
-  mutate(label = coalesce(species_fr, species_code),
-         label = reorder(label, n)) |>
-  ggplot(aes(x = n, y = label)) +
-  geom_col() +
-  scale_x_continuous(labels = label_number(big.mark = " ")) +
-  labs(x = "Nombre d'observations", y = NULL,
-       title = "Vingt espèces/codes les plus fréquents")
+missingness |> filter(missing > 0) |>
+  kable(col.names = c("Variable", "Nombre de valeurs manquantes"))
 ```
 
-# Distribution des diamètres
+Une valeur manquante de `data_quality_flag` signifie qu'aucun problème n'a été
+signalé par les règles de dépistage. Il ne s'agit pas d'une mesure perdue.
+Les âges manquants n'ont pas été imputés. Les niveaux de lecture et les codes
+`SOURCE_AGE` sont conservés dans la provenance; leur décodage figure dans
+`references/age_source_codes.csv`. Une carotte incomplète ne doit pas être
+présentée comme une mesure parfaite de l'âge total.
+
+Les 50 érables rouges n'ont aucun âge renseigné dans cette sélection. Une suppression de toutes les lignes sans âge retirerait donc entièrement cette espèce. Pour comparer les quatre espèces, utiliser d'abord le diamètre et la hauteur.
+
+La surface terrière est calculée par `pi * (diameter_cm / 200)^2`.
+Elle est entièrement déterminée par le diamètre. Les deux colonnes ne sont
+pas deux mesures indépendantes pour l'ACP ou la comparaison d'algorithmes.
+
+## Revue taxonomique
 
 ```{r}
-#| label: diameter-summary
-full |>
-  summarise(
-    n_non_manquant = sum(!is.na(diameter_cm)),
-    n_manquant = sum(is.na(diameter_cm)),
-    minimum = min(diameter_cm, na.rm = TRUE),
-    q1 = quantile(diameter_cm, 0.25, na.rm = TRUE),
-    mediane = median(diameter_cm, na.rm = TRUE),
-    moyenne = mean(diameter_cm, na.rm = TRUE),
-    q3 = quantile(diameter_cm, 0.75, na.rm = TRUE),
-    maximum = max(diameter_cm, na.rm = TRUE)
-  ) |>
-  knitr::kable(digits = 2)
+review |> select(species_code, species_fr, species_latin, genus, family, review_date) |>
+  kable()
 ```
+
+Les correspondances entre noms français MRNF et taxons VASCAN ont été
+vérifiées pour ces quatre espèces. Pour les autres codes de la table complète,
+`exact_code` signifie une correspondance automatique exacte après normalisation;
+`needs_review` conserve une correspondance non résolue. Les statuts
+`reviewed` ne sont attribués qu'aux quatre correspondances documentées.
+
+## Table complète et sélection
 
 ```{r}
-#| label: diameter-distribution
-#| fig-height: 5
-full |>
-  filter(!is.na(diameter_cm), diameter_cm > 0) |>
-  ggplot(aes(diameter_cm)) +
-  geom_histogram(bins = 60) +
-  labs(x = "DHP (cm)", y = "Effectif", title = "Distribution du diamètre")
+full |> tidyr::pivot_longer(everything(), names_to="indicateur", values_to="valeur") |>
+  mutate(valeur = if_else(grepl("year", indicateur), as.character(valeur),
+    format(valeur, scientific = FALSE, big.mark = " ", trim = TRUE))) |>
+  kable()
 ```
 
-# Distribution des hauteurs
+Les 1 961 039 observations de la table harmonisée correspondent au nombre
+exact de lignes de `DENDRO_ARBRES`. Aucune clé n'est dupliquée et aucune
+observation n'a été éliminée de cette table. Les mesures absentes restent
+absentes; `CL_DHP`, lorsqu'il est disponible dans la source, n'est pas utilisé
+comme un diamètre exact pour compléter `DHP`. Les hauteurs estimées restent
+identifiées séparément des hauteurs observées.
+
+Pour la petite version, on retire les codes agrégés, diamètres absents ou
+non positifs et hauteurs observées absentes ou non positives. Après tri stable
+par identifiant, le tirage retient un arbre par couple espèce-placette, puis
+50 arbres pour chacune des quatre espèces avec le plus de placettes admissibles.
+La graine `20260625` et les versions R des dépendances sont enregistrées.
 
 ```{r}
-#| label: height-source-summary
-full |>
-  count(height_source, name = "n") |>
-  mutate(proportion = n / sum(n)) |>
-  knitr::kable(digits = 4)
+exclusions |> group_by(stage) |> summarise(observations=sum(n), .groups="drop") |>
+  kable(col.names=c("Étape d'exclusion", "Observations"),
+        format.args=list(big.mark=" "))
 ```
 
-```{r}
-#| label: observed-height-distribution
-#| fig-height: 5
-full |>
-  filter(!is.na(height_observed_m), height_observed_m > 0) |>
-  ggplot(aes(height_observed_m)) +
-  geom_histogram(bins = 60) +
-  labs(x = "Hauteur observée (m)", y = "Effectif",
-       title = "Distribution des hauteurs observées")
-```
+Le journal comporte exactement `r format(sum(exclusions$n), scientific = FALSE, big.mark = " ")` arbres distincts :
+avec les 200 arbres retenus, il couvre toutes les observations de la table
+complète. Plusieurs raisons peuvent être attachées à une même exclusion;
+les effectifs ci-dessus comptent les lignes, sans dédoubler ces raisons.
 
-```{r}
-#| label: height-comparison
-#| fig-height: 5
-full |>
-  filter(height_source %in% c("observed", "estimated"), !is.na(height_m)) |>
-  ggplot(aes(height_m)) +
-  geom_density() +
-  facet_wrap(~ height_source, scales = "free_y") +
-  labs(x = "Hauteur (m)", y = "Densité",
-       title = "Hauteurs observées et estimées — ne pas les confondre")
-```
+## Limites à transmettre aux étudiants
 
-# Valeurs manquantes
+1. Les quatre effectifs sont imposés par la sélection pédagogique. Ils ne
+   permettent pas d'estimer la fréquence des espèces dans les forêts québécoises.
+2. La hauteur observée restreint l'analyse aux arbres mesurés à cette fin
+   dans le protocole d'inventaire. Le petit jeu n'est pas un tirage aléatoire
+   simple dans tous les arbres du Québec.
+3. L'équilibre par espèce n'impose aucun équilibre géographique ou temporel.
+4. Pour prédire l'espèce, retirer les colonnes qui la révèlent directement
+   (codes, noms, genre et famille) et les identifiants. Grouper les partitions
+   par placette; évaluer séparément la généralisation à d'autres régions.
+5. Les seuils de 300 cm de diamètre, 70 m de hauteur et 500 ans servent au
+   dépistage informatique. Ils ne sont pas présentés comme des maxima biologiques.
 
-```{r}
-#| label: missingness
-missingness <- full |>
-  summarise(across(everything(), ~ sum(is.na(.x)))) |>
-  pivot_longer(everything(), names_to = "variable", values_to = "n_missing") |>
-  mutate(
-    proportion_missing = n_missing / nrow(full),
-    variable = reorder(variable, proportion_missing)
-  ) |>
-  arrange(desc(proportion_missing))
+## Reproduction et sources
 
-knitr::kable(head(missingness, 40), digits = 4)
-```
-
-```{r}
-#| label: missingness-plot
-#| fig-height: 9
-missingness |>
-  filter(n_missing > 0) |>
-  ggplot(aes(proportion_missing, variable)) +
-  geom_col() +
-  scale_x_continuous(labels = percent) +
-  labs(x = "Proportion manquante", y = NULL,
-       title = "Valeurs manquantes par variable")
-```
-
-# Valeurs impossibles ou suspectes
-
-```{r}
-#| label: quality-flags
-flags <- full |>
-  filter(!is.na(data_quality_flag)) |>
-  separate_rows(data_quality_flag, sep = ";") |>
-  count(data_quality_flag, sort = TRUE, name = "n") |>
-  mutate(proportion_full = n / nrow(full))
-
-knitr::kable(flags, digits = 4)
-```
-
-```{r}
-#| label: explicit-screening
-screening <- tibble(
-  regle = c(
-    "diameter_cm <= 0",
-    "diameter_cm > 300",
-    "height_observed_m <= 0",
-    "height_observed_m > 70",
-    "age_years < 0",
-    "age_years > 500",
-    "latitude hors [-90, 90]",
-    "longitude hors [-180, 180]"
-  ),
-  n = c(
-    sum(full$diameter_cm <= 0, na.rm = TRUE),
-    sum(full$diameter_cm > 300, na.rm = TRUE),
-    sum(full$height_observed_m <= 0, na.rm = TRUE),
-    sum(full$height_observed_m > 70, na.rm = TRUE),
-    sum(full$age_years < 0, na.rm = TRUE),
-    sum(full$age_years > 500, na.rm = TRUE),
-    sum(!is.na(full$latitude) & (full$latitude < -90 | full$latitude > 90)),
-    sum(!is.na(full$longitude) & (full$longitude < -180 | full$longitude > 180))
-  ),
-  action = "signaler; ne pas supprimer automatiquement"
-)
-knitr::kable(screening)
-```
-
-Les seuils de 300 cm, 70 m et 500 ans sont des seuils de dépistage prudents du pipeline, non des maxima biologiques officiels. Toute exclusion doit s'appuyer sur la norme, le contexte et l'observation source.
-
-# Équilibre de la version pédagogique
-
-```{r}
-#| label: small-balance
-small_balance <- small |>
-  count(species_code, species, name = "n") |>
-  mutate(proportion = n / sum(n))
-knitr::kable(small_balance, digits = 4)
-```
-
-```{r}
-#| label: sampling-manifest
-knitr::kable(sampling_manifest)
-```
-
-```{r}
-#| label: small-diameter-height
-#| fig-height: 6
-small |>
-  ggplot(aes(diameter_cm, height_m, shape = species)) +
-  geom_point(alpha = 0.7) +
-  labs(x = "DHP (cm)", y = "Hauteur observée (m)",
-       title = "Version pédagogique : diamètre et hauteur par espèce")
-```
-
-# Comparaison entre version complète et version réduite
-
-```{r}
-#| label: full-vs-small-summary
-comparison <- bind_rows(
-  full |>
-    transmute(version = "complète", plot_id = as.character(plot_id), species_code, diameter_cm,
-              height_m = height_observed_m, age_years),
-  small |>
-    transmute(version = "pédagogique", plot_id = as.character(plot_id), species_code, diameter_cm,
-              height_m, age_years)
-) |>
-  group_by(version) |>
-  summarise(
-    n = n(),
-    species = n_distinct(species_code),
-    plots = n_distinct(plot_id, na.rm = TRUE),
-    diameter_mean = mean(diameter_cm, na.rm = TRUE),
-    diameter_median = median(diameter_cm, na.rm = TRUE),
-    height_mean = mean(height_m, na.rm = TRUE),
-    height_median = median(height_m, na.rm = TRUE),
-    age_missing = mean(is.na(age_years)),
-    .groups = "drop"
-  )
-knitr::kable(comparison, digits = 3)
-```
-
-```{r}
-#| label: full-vs-small-ecdf
-#| fig-height: 5
-bind_rows(
-  full |> transmute(version = "complète", diameter_cm),
-  small |> transmute(version = "pédagogique", diameter_cm)
-) |>
-  filter(!is.na(diameter_cm)) |>
-  ggplot(aes(diameter_cm, linetype = version)) +
-  stat_ecdf() +
-  labs(x = "DHP (cm)", y = "Fonction de répartition empirique",
-       title = "Sélection induite par la version pédagogique")
-```
-
-# Exclusions et justification
-
-```{r}
-#| label: exclusion-summary
-exclusion_summary <- exclusions |>
-  separate_rows(exclusion_reason, sep = ";") |>
-  count(stage, exclusion_reason, sort = TRUE, name = "n")
-knitr::kable(exclusion_summary)
-```
-
-```{r}
-#| label: exclusion-by-species
-exclusions |>
-  count(stage, species_code, sort = TRUE, name = "n") |>
-  group_by(stage) |>
-  slice_head(n = 20) |>
-  ungroup() |>
-  knitr::kable()
-```
-
-# Contrôles pédagogiques essentiels
-
-```{r}
-#| label: pedagogical-checks
-pedagogical_checks <- tibble(
-  controle = c(
-    "3 à 5 espèces",
-    "Effectifs égaux entre espèces",
-    "DHP entièrement observé",
-    "Hauteur entièrement observée",
-    "Une ligne maximum par espèce et placette",
-    "Présence de plot_id pour validation groupée",
-    "Taxonomie revue pour toutes les classes"
-  ),
-  reussi = c(
-    between(n_distinct(small$species_code), 3L, 5L),
-    n_distinct((small |> count(species_code))$n) == 1L,
-    all(!is.na(small$diameter_cm) & small$diameter_cm > 0),
-    all(!is.na(small$height_m) & small$height_m > 0),
-    !anyDuplicated(small |> select(species_code, plot_id)),
-    "plot_id" %in% names(small) && all(!is.na(small$plot_id)),
-    !any(sampling_manifest$selection_requires_taxonomic_review)
-  )
-)
-knitr::kable(pedagogical_checks)
-```
-
-# Dictionnaire et reproductibilité
-
-```{r}
-#| label: dictionary-check
-missing_dictionary_entries <- setdiff(names(full), dictionary$variable)
-extra_dictionary_entries <- setdiff(dictionary$variable, c(names(full), names(small)))
-
-tibble(
-  controle = c("Variables complètes sans dictionnaire", "Entrées non présentes dans les fichiers courants"),
-  resultat = c(
-    if (length(missing_dictionary_entries) == 0) "aucune" else paste(missing_dictionary_entries, collapse = ", "),
-    if (length(extra_dictionary_entries) == 0) "aucune" else paste(extra_dictionary_entries, collapse = ", ")
-  )
-) |>
-  knitr::kable()
-```
-
-```{r}
-#| label: session-info
-sessionInfo()
-```
+Le contrôle portable et la reconstruction depuis les archives figées sont
+expliqués dans `docs/reproduction.md`. Le registre `references/frozen_sources.csv`
+précise les empreintes des fichiers. Les sources sont le
+[MRNF, PET5](https://www.donneesquebec.ca/recherche/dataset/placettes-echantillons-temporaires-du-cinquieme-inventaire)
+(extraction du 25 juin 2026, CC BY 4.0) et
+[VASCAN 37.16](https://data.canadensys.net/ipt/resource?r=vascan&v=37.16)
+(CC0 1.0). Les transformations et attributions figurent dans `DATA_LICENSES.md`.

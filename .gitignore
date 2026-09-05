@@ -11,6 +11,12 @@ data_intermediate/*
 !data_intermediate/.gitkeep
 data_clean/*
 !data_clean/.gitkeep
+!data_clean/arbres_quebec_small.csv
+!data_clean/data_dictionary.csv
+!data_clean/small_sampling_manifest.csv
+!data_clean/validation_summary.csv
+!data_clean/arbres_quebec_small_dictionary.csv
+!data_clean/arbres_quebec_small_provenance.csv
 logs/*
 !logs/.gitkeep
 *.gpkg
@@ -19,3 +25,9 @@ logs/*
 
 /.quarto/
 **/*.quarto_ipynb
+outputs/
+dist/
+renv/library/
+renv/staging/
+renv/cache/
+Rplots.pdf

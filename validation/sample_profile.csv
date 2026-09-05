@@ -1,0 +1,5 @@
+species_code,species,n,plots,diameter_min_cm,diameter_mean_cm,diameter_max_cm,height_min_m,height_mean_m,height_max_m,age_missing,survey_year_min,survey_year_max
+BOP,Bouleau à papier (blanc),50,50,9.1,15.79,30.9,8.6,14.268,22,1,2017,2025
+EPN,Épinette noire,50,50,9.2,14.114,25.1,3.9,11.932,20.1,1,2015,2025
+ERR,Érable rouge,50,50,9.2,18.25,41.5,7.3,15.506,29.6,50,2015,2022
+SAB,Sapin baumier,50,50,9.1,13.728,25.9,6.5,11.736,21.7,0,2016,2024

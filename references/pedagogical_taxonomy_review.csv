@@ -1,0 +1,5 @@
+species_code,species_fr,species_latin,genus,family,vascan_taxon_id,source_url,review_date,review_scope
+BOP,Bouleau à papier (blanc),Betula papyrifera,Betula,Betulaceae,3697,https://data.canadensys.net/vascan/taxon/3697?lang=fr,2026-09-05,MRNF common name and VASCAN accepted species name genus and family
+EPN,Épinette noire,Picea mariana,Picea,Pinaceae,7174,https://data.canadensys.net/vascan/taxon/7174?lang=fr,2026-09-05,MRNF common name and VASCAN accepted species name genus and family
+ERR,Érable rouge,Acer rubrum,Acer,Sapindaceae,9212,https://data.canadensys.net/vascan/taxon/9212?lang=fr,2026-09-05,MRNF common name and VASCAN accepted species name genus and family
+SAB,Sapin baumier,Abies balsamea,Abies,Pinaceae,7159,https://data.canadensys.net/vascan/taxon/7159?lang=fr,2026-09-05,MRNF common name and VASCAN accepted species name genus and family

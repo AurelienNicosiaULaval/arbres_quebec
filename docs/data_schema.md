@@ -2,7 +2,7 @@
 
 ## Unité statistique
 
-`arbres_quebec.csv` contient une ligne par **arbre × campagne de mesure**. Cette définition fonctionne pour PET5/PET4 et demeure valide si PEP est ajouté plus tard.
+`arbres_quebec.csv` contient une ligne par arbre × campagne de mesure. Cette définition fonctionne pour PET5/PET4 et demeure valide si PEP est ajouté plus tard.
 
 Clés :
 
@@ -21,7 +21,7 @@ Clés :
 
 `species_code`, `species_fr`, `species_latin`, `genus`, `family`, `vascan_taxon_id`, `quebec_status`, `taxonomy_match_method`, `taxonomy_match_status`.
 
-Les champs scientifiques restent manquants tant qu'un appariement revu n'existe pas. Le code MRNF et le nom français décodé restent toujours traçables.
+Les champs scientifiques sont renseignés pour les appariements automatiques exacts ou documentés; le statut distingue ces deux cas. Le code MRNF et le nom français décodé restent toujours traçables.
 
 ### Mesures
 

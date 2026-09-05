@@ -1,18 +1,20 @@
 # Stratégie de nettoyage et architecture du dépôt
 
+Évaluation initiale du 25 juin 2026. Pour les données livrées et les contrôles de la version 1.0.0, consulter le README et `docs/reproduction.md`. Les alternatives PET4, PEP et Montréal ne sont pas incluses dans cette version.
+
 ## Pipeline en onze étapes
 
-1. **Référencer les sources.** Le manifeste enregistre identifiant, URL, format, licence, rôle et emplacement attendu.
-2. **Collecter sans écraser.** Le script de collecte écrit d'abord un fichier temporaire, calcule une empreinte SHA-256 et déplace atomiquement le résultat. Un fichier brut existant est conservé.
-3. **Extraire sans altérer l'archive.** Le ZIP reste dans `data_raw/`; son contenu est extrait dans `data_intermediate/` avec un marqueur contenant l'empreinte de l'archive.
-4. **Inspecter le GeoPackage.** Les tables sont découvertes via SQLite/GeoPackage. Le script échoue si une table ou une clé requise manque.
-5. **Lire les tables utiles.** `DENDRO_ARBRES`, `DENDRO_ARBRES_ETUDES`, `PLACETTE`, `CLASSI_ECO_PE` et, pour PEP, `PLACETTE_MES`.
-6. **Normaliser les noms.** `janitor::clean_names()` est appliqué sans modifier les fichiers sources.
-7. **Décoder les codes.** Les feuilles `ESSENCES`, `ETAT`, `ETAGE`, `REG_ECO` et `DOM_BIO` du dictionnaire officiel sont jointes exactement.
-8. **Harmoniser les mesures.** DHP mm→cm; hauteur dm→m; mesures observées et estimées conservées séparément; aucune imputation.
-9. **Enrichir la taxonomie.** Une table de correspondance versionnée, revue et attribuée à VASCAN ajoute noms scientifiques, genres, familles et groupes fonctionnels.
-10. **Créer les produits.** La version complète garde les anomalies signalées; la petite version applique une règle d'admissibilité et un échantillonnage équilibré documentés.
-11. **Valider.** Le rapport Quarto vérifie clés, effectifs, distributions, valeurs manquantes, drapeaux, équilibre, exclusions et différence entre les deux versions.
+1. Référencer les sources. Le manifeste enregistre identifiant, URL, format, licence, rôle et emplacement attendu.
+2. Collecter sans écraser. Le script de collecte écrit d'abord un fichier temporaire, calcule une empreinte SHA-256 et déplace atomiquement le résultat. Un fichier brut existant est conservé.
+3. Extraire sans altérer l'archive. Le ZIP reste dans `data_raw/`; son contenu est extrait dans `data_intermediate/` avec un marqueur contenant l'empreinte de l'archive.
+4. Inspecter le GeoPackage. Les tables sont découvertes via SQLite/GeoPackage. Le script échoue si une table ou une clé requise manque.
+5. Lire les tables utiles. `DENDRO_ARBRES`, `DENDRO_ARBRES_ETUDES`, `PLACETTE`, `CLASSI_ECO_PE` et, pour PEP, `PLACETTE_MES`.
+6. Normaliser les noms. `janitor::clean_names()` est appliqué sans modifier les fichiers sources.
+7. Décoder les codes. Les feuilles `ESSENCES`, `ETAT`, `ETAGE`, `REG_ECO` et `DOM_BIO` du dictionnaire officiel sont jointes exactement.
+8. Harmoniser les mesures. DHP mm→cm; hauteur dm→m; mesures observées et estimées conservées séparément; aucune imputation.
+9. Enrichir la taxonomie. Une table de correspondance versionnée, revue et attribuée à VASCAN ajoute noms scientifiques, genres, familles et groupes fonctionnels.
+10. Créer les produits. La version complète garde les anomalies signalées; la petite version applique une règle d'admissibilité et un échantillonnage équilibré documentés.
+11. Valider. Le rapport Quarto vérifie clés, effectifs, distributions, valeurs manquantes, drapeaux, équilibre, exclusions et différence entre les deux versions.
 
 ## Rôle des dossiers
 

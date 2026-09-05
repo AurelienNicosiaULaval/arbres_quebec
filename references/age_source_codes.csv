@@ -1,0 +1,15 @@
+code,label
+1,Carotte complète pour analyse en laboratoire.
+10,Carotte incomplète sans moëlle analysée en forêt.
+11,Carotte incomplète pour analyse en laboratoire.
+12,Carotte incomplète analysée en forêt.
+13,Carotte incomplète analysée en laboratoire avec plus de cinq cernes absents
+14,Carotte non analysée
+2,Carotte en attente d'une analyse.
+3,Carotte complète analysée en forêt.
+4,Carotte complète analysée en laboratoire.
+5,Âge déduit de la carotte cariée.
+6,Carotte incomplète analysée en laboratoire avec un à cinq cernes absents.
+7,Mise à jour de l'âge avec l'inter mesure.
+8,Carotte cariée.
+9,Carotte absente.

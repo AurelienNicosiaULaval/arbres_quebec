@@ -35,6 +35,9 @@ if (!source_inventory %in% c("PET5", "PET4", "PEP")) {
 }
 
 overwrite_clean <- as_bool_env("OVERWRITE_CLEAN", FALSE)
+if (!overwrite_clean && file.exists("data_clean/arbres_quebec_small.csv")) {
+  stop("Sorties existantes : utiliser OVERWRITE_CLEAN=true pour reconstruire.", call. = FALSE)
+}
 small_n_species <- as_int_env("SMALL_N_SPECIES", 4L)
 small_n_per_species_requested <- as_int_env("SMALL_N_PER_SPECIES", 50L)
 small_seed <- as_int_env("SMALL_SEED", 20260625L)
@@ -145,6 +148,10 @@ read_selected <- function(target_table, wanted, required = character(), limit = 
     "SELECT ",
     paste(DBI::dbQuoteIdentifier(con, selected$actual), collapse = ", "),
     " FROM ", DBI::dbQuoteIdentifier(con, actual_table),
+    if (target_table %in% c("DENDRO_ARBRES", "DENDRO_ARBRES_ETUDES")) {
+      paste0(" ORDER BY ", DBI::dbQuoteIdentifier(con,
+        field_map$actual[match(if (source_inventory == "PEP") "id_arb_mes" else "id_arbre", field_map$clean)]))
+    } else "",
     if (limit > 0L) paste0(" LIMIT ", as.integer(limit)) else ""
   )
   DBI::dbGetQuery(con, sql) |>
@@ -208,7 +215,7 @@ trees <- read_selected(
 study_fields <- c(
   "id_pe", "id_pe_mes", "no_mes", "no_arbre", "id_arbre", "id_arb_mes",
   "met_selec", "etat", "essence", "dhp", "haut_arbre", "age", "age_sansop",
-  "source_age", "ensoleil", "etage_arb"
+  "source_age", "ensoleil", "etage_arb", "nivlectage"
 )
 study <- read_selected(
   "DENDRO_ARBRES_ETUDES", study_fields,
@@ -282,6 +289,7 @@ study_reduced <- study |>
     study_age_years = safe_numeric(age),
     study_age_without_op = safe_numeric(age_sansop),
     study_age_source_code = as.character(source_age),
+    study_age_reading_height_cm = safe_numeric(nivlectage),
     study_sunlight_code = as.character(ensoleil),
     study_canopy_stratum_code = as.character(etage_arb)
   ) |>
@@ -580,8 +588,10 @@ if (nrow(eligible) == 0L) {
   stop("Aucun arbre admissible pour la petite version.", call. = FALSE)
 }
 
+RNGkind("Mersenne-Twister", "Inversion", "Rejection")
 set.seed(small_seed)
 one_per_species_plot <- eligible |>
+  arrange(record_id) |>
   group_by(species_code, plot_id) |>
   slice_sample(n = 1L) |>
   ungroup()
@@ -665,8 +675,22 @@ not_sampled_balancing <- one_per_species_plot |>
     stage = "small_balancing"
   )
 
-exclusion_log <- bind_rows(exclusion_log, not_selected_species, not_sampled_balancing) |>
+not_selected_within_plot <- eligible |>
+  anti_join(one_per_species_plot |> select(record_id), by = "record_id") |>
+  transmute(
+    record_id, tree_id, plot_id, species_code,
+    exclusion_reason = "eligible_not_selected_within_species_plot",
+    stage = "small_within_plot"
+  )
+
+exclusion_log <- bind_rows(exclusion_log, not_selected_species,
+                          not_sampled_balancing, not_selected_within_plot) |>
   arrange(stage, species_code, record_id)
+
+stopifnot(!anyDuplicated(full$record_id),
+          !anyDuplicated(exclusion_log$record_id),
+          nrow(full) == nrow(exclusion_log) + nrow(small),
+          length(intersect(exclusion_log$record_id, small$record_id)) == 0L)
 
 # Validation structurée -----------------------------------------------------
 
@@ -718,6 +742,17 @@ write_atomic_csv(validation_summary, outputs[["validation"]], overwrite = overwr
 project_dictionary <- read_csv("data_dictionary.csv", show_col_types = FALSE)
 write_atomic_csv(project_dictionary, outputs[["dictionary"]],
                  overwrite = overwrite_clean)
+write_atomic_csv(
+  project_dictionary |> filter(variable %in% names(small)) |>
+    mutate(
+      source_table = if_else(variable == "height_m", "DENDRO_ARBRES_ETUDES;DENDRO_ARBRES", source_table),
+      source_field = if_else(variable == "height_m", "HAUT_ARBRE", source_field),
+      transformation = if_else(variable == "height_m", "HAUT_ARBRE / 10; hauteur observée uniquement", transformation),
+      notes = if_else(variable == "height_m", "Aucune hauteur estimée dans la version pédagogique", notes)
+    ) |>
+    arrange(match(variable, names(small))),
+  "data_clean/arbres_quebec_small_dictionary.csv", overwrite = overwrite_clean
+)
 
 if (requireNamespace("arrow", quietly = TRUE)) {
   parquet_path <- file.path("data_clean", "arbres_quebec.parquet")

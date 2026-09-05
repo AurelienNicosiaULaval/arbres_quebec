@@ -1,98 +1,83 @@
-# arbres_quebec
+# Arbres du Québec
 
-## Objectif
+Un jeu de données pour enseigner la statistique et R avec des arbres mesurés au Québec. La version pédagogique contient 200 arbres, soit 50 de chacune de quatre espèces : bouleau à papier, épinette noire, érable rouge et sapin baumier. Elle propose une alternative forestière à `iris`, avec des mesures de diamètre et de hauteur et une provenance vérifiable pour chaque ligne.
 
-Ce dépôt fait partie d'une série visant à proposer des versions québécoises de jeux de données populaires en science des données. L'objectif est de fournir des alternatives pédagogiques locales, reproductibles et documentées, construites à partir de données réelles du Québec plutôt que de jeux classiques très utilisés comme `iris`.
+Version 1.0.0, 5 septembre 2026.
 
-Pipeline reproductible pour construire un jeu de données pédagogique québécois d'arbres à partir des inventaires écoforestiers ouverts du ministère des Ressources naturelles et des Forêts (MRNF).
+## Télécharger et commencer
 
-## Décision scientifique
+1. [Télécharger le petit jeu et l'activité R](https://github.com/AurelienNicosiaULaval/arbres_quebec/releases/download/v1.0.0/arbres_quebec-v1.0.0.zip).
+2. Décompresser l'archive et ouvrir `arbres_quebec.Rproj` dans RStudio.
+3. Ouvrir `docs/premiers_pas.html` pour suivre l'activité, ou exécuter `examples/01_explorer_les_arbres.R`.
 
-Ce projet ne prétend pas reproduire les mesures florales de `iris`. Les sources forestières ne contiennent pas la longueur et la largeur des sépales ou pétales. Elles permettent toutefois un **équivalent botanique et dendrométrique** crédible : une ligne par arbre (ou par arbre et campagne de mesure), une espèce cible, des mesures réelles de diamètre, de hauteur et parfois d'âge, ainsi que le contexte de placette.
-
-La source recommandée pour une première version est la **Placette-échantillon temporaire du cinquième inventaire (PET5)**. Elle évite la dépendance temporelle propre aux placettes permanentes et fournit une structure plus simple pour l'enseignement. La version pédagogique doit privilégier les arbres d'étude ayant une hauteur observée; les hauteurs estimées restent identifiées séparément dans la version complète.
-
-## Ce dépôt ne contient pas de fausses observations
-
-Les dossiers de données sont vides à l'origine. Les fichiers suivants sont produits seulement après téléchargement et exécution du pipeline :
-
-- `data_clean/arbres_quebec.csv` : version complète harmonisée;
-- `data_clean/arbres_quebec_small.csv` : sous-échantillon pédagogique équilibré;
-- `data_clean/data_dictionary.csv` : dictionnaire livré avec la version construite;
-- `data_clean/exclusion_log.csv` : exclusions de la petite version;
-- `data_clean/validation_summary.csv` : contrôles structurés.
-
-Aucune ligne synthétique ou imputée n'est fournie.
-
-## Démarrage
-
-### 1. Dépendances R
+[CSV pédagogique seul](https://raw.githubusercontent.com/AurelienNicosiaULaval/arbres_quebec/v1.0.0/data_clean/arbres_quebec_small.csv) · [Dictionnaire des 21 variables](data_clean/arbres_quebec_small_dictionary.csv) · [Tous les fichiers de la version](https://github.com/AurelienNicosiaULaval/arbres_quebec/releases/tag/v1.0.0)
 
 ```r
-install.packages(c(
-  "arrow", "cli", "curl", "DBI", "dbplyr", "digest", "dplyr",
-  "fs", "ggplot2", "janitor", "knitr", "lubridate", "purrr", "readr",
-  "readxl", "rlang", "RSQLite", "scales", "sf", "stringr",
-  "tibble", "tidyr"
-))
+# Installation à effectuer une seule fois.
+install.packages(c("readr", "dplyr", "ggplot2"))
+
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+arbres <- read_csv(
+  "data_clean/arbres_quebec_small.csv",
+  col_types = cols(.default = col_guess(), plot_id = col_character(),
+                   tree_id = col_character(), record_id = col_character())
+)
+
+arbres |> count(species)
+
+ggplot(arbres, aes(diameter_cm, height_m, colour = species)) +
+  geom_point() +
+  labs(x = "Diamètre (cm)", y = "Hauteur observée (m)", colour = "Espèce") +
+  theme_minimal()
 ```
 
-`terra` est utile pour des traitements spatiaux complémentaires, mais n'est pas requis par le pipeline initial.
+## Contenu
 
-### 2. Collecte
+| Fichier | Usage |
+|---|---|
+| `data_clean/arbres_quebec_small.csv` | 200 arbres et 21 variables, directement utilisables dans R |
+| `data_clean/arbres_quebec_small_dictionary.csv` | Définition et unités des 21 variables |
+| `data_clean/arbres_quebec_small_provenance.csv` | Valeurs sources et identifiants des 200 arbres |
+| `data_clean/small_sampling_manifest.csv` | Espèces sélectionnées, effectifs et graine |
+| `docs/premiers_pas.html` | Activité exécutée : importation, tableaux, graphique et exercices |
+| `docs/validation_report.html` | Résultats des contrôles et limites d'utilisation |
+| `validation/` | Contrôles, profils, vérification source et environnement R |
+| `arbres_quebec.parquet`, dans la release | Table complète harmonisée : 1 961 039 observations et 41 901 placettes |
 
-Le téléchargement du GeoPackage PET5 est désactivé par défaut, car l'archive est volumineuse. Pour autoriser les gros téléchargements :
+Les HTML sont inclus dans l'archive pédagogique. La table complète et les sources volumineuses sont des fichiers de la release, hors de l'historique Git.
+
+## Construction et portée
+
+La source est le jeu PET5 du ministère des Ressources naturelles et des Forêts (MRNF), téléchargé le 25 juin 2026. Les fichiers originaux sont figés par leurs empreintes SHA-256. La taxonomie est rapprochée de VASCAN 37.16. Les quatre espèces pédagogiques ont en plus une revue documentaire explicitée dans [`references/pedagogical_taxonomy_review.csv`](references/pedagogical_taxonomy_review.csv).
+
+La sélection utilise les arbres ayant une essence non agrégée, un diamètre positif et une hauteur observée positive. Après classement stable par identifiant, un arbre est tiré par couple espèce-placette. Les quatre espèces avec le plus de placettes admissibles sont retenues, puis 50 arbres sont tirés par espèce. La graine est `20260625`; l'environnement R est enregistré. Chaque autre observation figure dans le journal d'exclusion de la construction.
+
+Cette sélection est équilibrée pour l'enseignement. Elle ne fournit pas les proportions des espèces, ni des moyennes représentatives de tous les arbres du Québec. Les mesures florales de `iris` ne sont pas reproduites.
+
+## Précautions pour l'analyse
+
+- `height_m` est toujours observée dans le petit jeu. Dans la table complète, consulter `height_source` pour distinguer hauteurs observées et estimées.
+- Les âges manquants restent manquants. L'âge publié peut provenir d'une carotte complète ou incomplète, à un niveau de lecture donné; il ne représente pas nécessairement l'âge total de l'arbre.
+- `basal_area_m2` est une fonction déterministe du diamètre. Ne pas la compter comme une mesure indépendante supplémentaire dans une ACP.
+- Les régions écologiques ne sont pas des régions administratives. Le petit jeu n'est pas équilibré par région ni par année.
+- Pour la classification, exclure les noms, codes, genres, familles et identifiants des prédicteurs. Grouper les partitions par `plot_id`; une extension à d'autres régions demande une validation spatiale adaptée.
+- La table complète conserve les codes non résolus et les anomalies signalées. `exact_code` désigne un appariement automatique; `reviewed` une revue documentaire. La revue de livraison porte sur les quatre espèces du petit jeu.
+
+## Vérifier ou reconstruire
+
+Les commandes et les deux niveaux de validation, portable et depuis les sources, sont décrits dans [`docs/reproduction.md`](docs/reproduction.md). La reconstruction intégrale nécessite plusieurs gigaoctets d'espace de travail. Le petit jeu peut être utilisé sans télécharger ces sources.
+
+Le dépôt utilise SSH :
 
 ```bash
-DOWNLOAD_LARGE_FILES=true Rscript scripts/01_collect_botanical_sources.R
+git clone git@github.com:AurelienNicosiaULaval/arbres_quebec.git
 ```
 
-Sans cette variable, le script télécharge seulement les petits documents et produit des instructions de téléchargement manuel. Il ne remplace jamais un fichier brut existant.
+## Sources, licence et citation
 
-### 3. Nettoyage
+MRNF (2018), [Placette-échantillon temporaire du cinquième inventaire](https://www.donneesquebec.ca/recherche/dataset/placettes-echantillons-temporaires-du-cinquieme-inventaire), extraction du 25 juin 2026, CC BY 4.0. Brouillet et al. (2010+), [VASCAN, version 37.16](https://data.canadensys.net/ipt/resource?r=vascan&v=37.16), CC0 1.0. Les transformations et la sélection pédagogique sont celles de ce dépôt.
 
-```bash
-ARBRES_QC_SOURCE=PET5 Rscript scripts/02_clean_botanical_data.R
-```
-
-Variables d'environnement utiles :
-
-```bash
-SMALL_N_SPECIES=4 SMALL_N_PER_SPECIES=50 SMALL_SEED=20260625 \
-OVERWRITE_CLEAN=false Rscript scripts/02_clean_botanical_data.R
-```
-
-### 4. Validation
-
-```bash
-quarto render docs/validation_report.qmd
-```
-
-## Principes de construction
-
-- Les unités sources sont conservées dans les champs bruts et converties explicitement : DHP en millimètres vers centimètres; hauteur en décimètres vers mètres.
-- `height_observed_m` et `height_estimated_m` ne sont jamais confondus silencieusement.
-- Les valeurs manquantes restent manquantes; le pipeline n'effectue aucune imputation.
-- Les anomalies sont signalées plutôt que supprimées dans la version complète.
-- La sélection de la petite version est déterministe, déclarée et journalisée.
-- Les noms scientifiques, genres et familles exigent une correspondance taxonomique revue. Un gabarit est fourni dans `references/species_taxonomy_crosswalk.csv`.
-- Les séparations apprentissage/test doivent être groupées par placette afin de réduire la fuite d'information.
-
-## Structure
-
-- `data_raw/` : fichiers téléchargés, inchangés et accompagnés de sommes SHA-256.
-- `data_intermediate/` : extractions et tables de travail régénérables.
-- `data_clean/` : produits analytiques finaux.
-- `R/` : fonctions réutilisables.
-- `scripts/` : scripts ordonnés de collecte et de nettoyage.
-- `docs/` : diagnostic, activités pédagogiques et rapport Quarto.
-- `references/` : manifeste des sources, gabarit taxonomique et décisions documentaires.
-- `logs/` : journaux de collecte et d'exécution.
-
-## Licences
-
-Le code du dépôt est sous licence MIT. Les données sources conservent leur licence propre. Les données MRNF et celles de Montréal sont annoncées sous CC BY 4.0; VASCAN est sous CC0 1.0. Voir `DATA_LICENSES.md`. Le dépôt ne relicencie pas les données de tiers.
-
-## Citation
-
-Voir `CITATION.cff`. Pour une publication ou un travail étudiant, citer également les jeux sources, leur date d'accès, leur version ou empreinte SHA-256, et VASCAN lorsqu'il est utilisé.
+Le code est sous MIT; les données MRNF et leurs adaptations sont sous CC BY 4.0. Voir [`DATA_LICENSES.md`](DATA_LICENSES.md) et [`CITATION.cff`](CITATION.cff).

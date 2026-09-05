@@ -18,6 +18,10 @@ safe_date <- function(x) {
   if (inherits(x, "Date")) return(x)
   if (inherits(x, c("POSIXct", "POSIXlt"))) return(as.Date(x))
   x <- as.character(x)
+  # GeoPackage exports use ISO 8601 timestamps, including milliseconds and Z.
+  # Keep their calendar date; these are survey dates, not local event times.
+  iso_date <- grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}T", x)
+  x[!is.na(iso_date) & iso_date] <- substr(x[!is.na(iso_date) & iso_date], 1, 10)
   parsed <- suppressWarnings(lubridate::parse_date_time(
     x,
     orders = c("Ymd", "Y-m-d", "Y/m/d", "dmY", "d/m/Y", "mdY", "m/d/Y")
@@ -55,7 +59,7 @@ classify_observation_quality <- function(species_code, diameter_cm,
   dplyr::case_when(
     severe ~ "review_required",
     is.na(species_code) | is.na(diameter_cm) ~ "insufficient",
-    !is.na(height_observed_m) & taxonomy_match_status %in% c("reviewed", "exact_code") ~
+    !is.na(height_observed_m) & taxonomy_match_status == "reviewed" ~
       "A_observed_taxonomy_reviewed",
     !is.na(height_observed_m) ~ "B_observed_height",
     !is.na(height_estimated_m) ~ "C_estimated_height",

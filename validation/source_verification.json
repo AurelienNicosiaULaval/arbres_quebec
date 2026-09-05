@@ -1,0 +1,174 @@
+{
+  "release": "1.0.0",
+  "checked_on": "2026-09-05",
+  "source_sha256": "a59c96d55cfea48233f6699369f9235f6fe809cc80eb75170201db7345a290da",
+  "source_rows": 1961039,
+  "full_parquet_sha256": "a048bdf0a5695a53b05437f986844d55e8f04871e396da42c6ab3a50cea3164c",
+  "dictionary_sha256": "3dba4d4b5e72a7620b5692af0eae7f20ddbbf1ece5ea79e0c7e250d1c8f322cd",
+  "taxonomy_review_sha256": "80e05220ffcc3d51a824dde353977d387d6d158a75a5f34e65b0594d4c3b63f8",
+  "small_sha256": "1af11ff0fc824f35286987928f0423441540ece1badb674f347ab05db07d4ccf",
+  "provenance_sha256": "fcaa1b9848a609b8b3cc4c942c3a31eccc69b3e8782dfad755d283b96bf49b0f",
+  "checks": [
+    {
+      "check": "csv_parsing",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "200_trees",
+      "passed": true,
+      "detail": "200"
+    },
+    {
+      "check": "four_species_50_each",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique_record_ids",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique_species_plot",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "positive_measured_diameter_height",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "screening_thresholds",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "survey_year_present",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no_quality_flags",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "documented_taxonomy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "basal_area_formula",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "complete_small_dictionary",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "taxonomy_names_and_families",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "iso_survey_date_regression",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen_geopackage_sha256",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen_dictionary_and_taxonomy_sha256",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "raw_rows_found_once",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "raw_record_ids",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "raw_plot_ids",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "raw_species_codes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "raw_diameter_conversion",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "raw_observed_height_conversion",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "raw_age_including_missingness",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "raw_survey_year",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "raw_codebook_ETAGE",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "raw_codebook_REG_ECO",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "raw_codebook_ESSENCES",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "full_source_row_count",
+      "passed": true,
+      "detail": "1961039"
+    },
+    {
+      "check": "full_unique_keys",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "full_plot_ids_present",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "full_survey_dates_present",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "exclusions_account_for_every_other_tree",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "all_passed": true
+}

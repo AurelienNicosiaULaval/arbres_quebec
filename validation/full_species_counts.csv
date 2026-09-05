@@ -1,0 +1,63 @@
+species_code,species_latin,taxonomy_match_status,n
+SAB,Abies balsamea,reviewed,637486
+EPN,Picea mariana,reviewed,396896
+BOP,Betula papyrifera,reviewed,231665
+ERR,Acer rubrum,reviewed,102607
+PET,Populus tremuloides,exact_code,90395
+EPB,Picea glauca,exact_code,79922
+PIG,Pinus banksiana,exact_code,75730
+ERS,Acer saccharum,exact_code,66821
+BOJ,Betula alleghaniensis,exact_code,63879
+THO,Thuja occidentalis,exact_code,55241
+EPR,,needs_review,26253
+HEG,Fagus grandifolia,exact_code,18321
+MEL,Larix laricina,exact_code,18074
+PRP,Prunus pensylvanica,exact_code,18005
+PIB,Pinus strobus,exact_code,12075
+PRU,Tsuga canadensis,exact_code,9580
+PEG,Populus grandidentata,exact_code,6858
+FRN,Fraxinus nigra,exact_code,6406
+ERP,Acer pensylvanicum,exact_code,4986
+SOA,Sorbus americana,exact_code,4796
+SAL,Salix alba,exact_code,4720
+CHR,Quercus rubra,exact_code,4396
+PEB,Populus balsamifera,exact_code,4154
+EPO,Picea abies,exact_code,4041
+PIR,Pinus resinosa,exact_code,3879
+OSV,Ostrya virginiana,exact_code,2712
+BOG,Betula populifolia,exact_code,2509
+TIL,Tilia americana,exact_code,1696
+FRA,Fraxinus americana,exact_code,1461
+CET,Prunus serotina,exact_code,1411
+ORA,Ulmus americana,exact_code,897
+ERE,Acer spicatum,exact_code,845
+SOD,Sorbus decora,exact_code,460
+RES,,needs_review,266
+PIS,Pinus sylvestris,exact_code,221
+FRP,Fraxinus pennsylvanica,exact_code,204
+MEH,,needs_review,184
+AUR,,needs_review,182
+FEU,,needs_review,140
+ERA,Acer saccharinum,exact_code,131
+AME,,needs_review,90
+PEH,,needs_review,89
+ORT,Ulmus thomasii,exact_code,79
+MAS,,needs_review,72
+CAC,Carya cordiformis,exact_code,60
+CHG,Quercus macrocarpa,exact_code,30
+PRV,Prunus virginiana,exact_code,20
+CAR,Carpinus caroliniana,exact_code,19
+CRA,,needs_review,18
+NOC,Juglans cinerea,exact_code,18
+ORR,,needs_review,10
+CHB,Quercus alba,exact_code,7
+AUC,,needs_review,4
+INC,,needs_review,3
+MEU,,needs_review,3
+AEH,Aesculus hippocastanum,exact_code,2
+COA,Cornus alternifolia,exact_code,2
+ERG,Acer negundo,exact_code,2
+PEU,,needs_review,2
+RHS,,needs_review,2
+ERN,Acer nigrum,exact_code,1
+PED,Populus deltoides,exact_code,1

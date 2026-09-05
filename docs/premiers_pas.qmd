@@ -1,0 +1,109 @@
+---
+title: "Explorer 200 arbres du Québec"
+subtitle: "Une première activité avec R"
+lang: fr
+format:
+  html:
+    toc: true
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+Ce jeu réunit 50 arbres de chacune de quatre espèces. Les diamètres et les
+hauteurs proviennent du cinquième inventaire écoforestier du MRNF. Les
+observations ont été sélectionnées pour l'enseignement; leur répartition ne
+représente pas les proportions des espèces dans la forêt québécoise.
+
+## 1. Ouvrir le projet
+
+Télécharger [l'archive pédagogique de la version 1.0.0](https://github.com/AurelienNicosiaULaval/arbres_quebec/releases/download/v1.0.0/arbres_quebec-v1.0.0.zip),
+la décompresser et ouvrir `arbres_quebec.Rproj` dans RStudio.
+
+Installer une seule fois les quatre paquets nécessaires, dans la console de RStudio :
+
+```{r}
+#| eval: false
+install.packages(c("readr", "dplyr", "ggplot2", "knitr"))
+```
+
+## 2. Importer les données
+
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+arbres <- read_csv(
+  "data_clean/arbres_quebec_small.csv",
+  col_types = cols(.default = col_guess(), plot_id = col_character(),
+                   tree_id = col_character(), record_id = col_character())
+)
+
+arbres |> count(species, name = "nombre")
+```
+
+Une ligne représente un arbre. `species` indique son espèce, `diameter_cm`
+son diamètre à hauteur de poitrine en centimètres, `height_m` sa hauteur
+observée en mètres et `survey_year` l'année du relevé. Les identifiants sont
+lus comme du texte pour conserver leurs zéros initiaux.
+
+## 3. Décrire les espèces
+
+```{r}
+portrait <- arbres |>
+  group_by(species) |>
+  summarise(
+    nombre = n(),
+    diametre_moyen_cm = mean(diameter_cm),
+    hauteur_moyenne_m = mean(height_m),
+    ages_manquants = sum(is.na(age_years)),
+    .groups = "drop"
+  )
+knitr::kable(portrait, digits = 2)
+```
+
+Les valeurs manquantes de `age_years` sont conservées. L'âge publié dans la
+source dépend de la carotte de bois et du niveau de lecture; il ne faut pas
+l'interpréter automatiquement comme l'âge total depuis la germination.
+Les codes et niveaux de lecture sont fournis dans le fichier de provenance.
+
+## 4. Tracer le diamètre et la hauteur
+
+```{r}
+#| fig-width: 8
+#| fig-height: 5
+#| fig-alt: "Nuage des diamètres et hauteurs observés pour 200 arbres, avec une couleur pour chacune des quatre espèces."
+ggplot(arbres, aes(diameter_cm, height_m, colour = species)) +
+  geom_point(size = 2, alpha = 0.8) +
+  scale_colour_brewer(palette = "Dark2") +
+  labs(x = "Diamètre à hauteur de poitrine (cm)", y = "Hauteur observée (m)",
+       colour = "Espèce") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom") +
+  guides(colour = guide_legend(nrow = 2))
+```
+
+L'association observée décrit les arbres de cet échantillon. Elle ne démontre
+pas une relation causale. La surface terrière, `basal_area_m2`, est calculée
+à partir du diamètre : ce n'est pas une troisième mesure indépendante.
+
+## 5. À vous de jouer
+
+1. Remplacer les moyennes par des médianes dans le tableau.
+2. Ajouter `facet_wrap(~ species)` au graphique pour obtenir un panneau par espèce.
+3. Trouver les années de relevé les plus anciennes et les plus récentes avec `range(arbres$survey_year)`.
+4. Expliquer pourquoi les quatre effectifs égaux ne permettent pas de conclure que chaque espèce représente 25 % des arbres du Québec.
+
+Point d'arrêt : avoir importé les données, produit le tableau et le graphique,
+puis répondu aux quatre questions. Le script complet se trouve dans
+`examples/01_explorer_les_arbres.R`.
+
+## Sources
+
+MRNF (2018, extraction du 25 juin 2026),
+[Placette-échantillon temporaire du cinquième inventaire](https://www.donneesquebec.ca/recherche/dataset/placettes-echantillons-temporaires-du-cinquieme-inventaire),
+CC BY 4.0. Les noms scientifiques sont vérifiés avec
+[VASCAN](https://data.canadensys.net/vascan/), version 37.16 et fiches consultées
+le 5 septembre 2026. Les références détaillées sont dans `DATA_LICENSES.md`.

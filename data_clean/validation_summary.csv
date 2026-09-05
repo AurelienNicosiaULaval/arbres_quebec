@@ -1,0 +1,13 @@
+metric,value,detail
+full_observations,1961039,
+full_plots,41901,
+full_species_codes,62,
+small_observations,200,
+small_species,4,
+small_n_per_species,50,
+missing_diameter_full,1596702,
+missing_observed_height_full,1770496,
+estimated_height_records_full,1541190,
+quality_flags_nonmissing,1748715,
+duplicate_record_keys,0,
+source_file_sha256,,a59c96d55cfea48233f6699369f9235f6fe809cc80eb75170201db7345a290da

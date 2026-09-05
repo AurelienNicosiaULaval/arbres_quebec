@@ -1,9 +1,14 @@
-# Références versionnées
+# Références
 
-- `source_manifest.csv` décrit les ressources candidates et leur emplacement local.
-- `species_taxonomy_crosswalk.csv` doit être rempli et revu avant publication des noms scientifiques, genres, familles et groupes feuillus/résineux.
-- `species_code_exclusions.csv` documente les codes agrégés, inconnus ou non admissibles comme classes de la petite version.
+- `frozen_sources.csv` : sources exactes de la version, URL et SHA-256.
+- `source_manifest.csv` : ressources officielles disponibles pour des constructions ultérieures; leurs URL sont évolutives.
+- `mrnf_field_inventory.csv` : champs et descriptions extraits du dictionnaire MRNF, avec son empreinte.
+- `mrnf_species_codes.csv` : codes et noms de la feuille `ESSENCES`, y compris les codes agrégés.
+- `species_taxonomy_crosswalk.csv` : résultat reproductible du rapprochement avec VASCAN 37.16. `exact_code` désigne un appariement automatique après normalisation, `reviewed` une revue documentaire consignée et `needs_review` une correspondance non résolue.
+- `pedagogical_taxonomy_review.csv` : références et portée de la revue des quatre espèces pédagogiques.
+- `age_source_codes.csv` : décodage officiel de `SOURCE_AGE`, extrait du dictionnaire figé.
+- `species_code_exclusions.csv` : éventuelles exclusions explicites supplémentaires. Le fichier vide n'ajoute aucune exclusion; le pipeline détecte aussi les libellés agrégés et les mesures manquantes.
 
-Le pipeline n'effectue pas de correspondance taxonomique floue silencieuse. Une ligne sans appariement revu conserve ses codes et noms français sources, tandis que les champs taxonomiques restent manquants.
-- `mrnf_field_inventory.csv` est une extraction traçable des feuilles PEP, PET4 et PET5 du dictionnaire officiel inspecté; chaque ligne porte l'empreinte SHA-256 du XLSX.
-- `mrnf_species_codes.csv` est l'extraction des codes et noms français de la feuille `ESSENCES`; elle contient aussi des codes non spécifiques, qui ne doivent pas être assimilés automatiquement à des espèces biologiques.
+Les champs `quebec_status` sont repris de la table de distribution de VASCAN au
+rang d'espèce. Une valeur vide n'indique pas l'absence au Québec : pour certains
+taxons, la répartition du site VASCAN est calculée à partir des taxons inférieurs.
